@@ -77,9 +77,9 @@ WSGI_APPLICATION = 'exchange.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'crypto_db',
+        'NAME': 'aban',
         'USER': 'postgres',
-        'PASSWORD': 'your_password',
+        'PASSWORD': '1234',
         'HOST': 'localhost',
         'PORT': '5432',
     }
