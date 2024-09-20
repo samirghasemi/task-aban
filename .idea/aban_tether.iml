@@ -15,13 +15,18 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/exchange" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/aban" />
       <excludeFolder url="file://$MODULE_DIR$/aban/Include" />
       <excludeFolder url="file://$MODULE_DIR$/aban/Lib" />
       <excludeFolder url="file://$MODULE_DIR$/aban/Scripts" />
       <excludeFolder url="file://$MODULE_DIR$/abbas_tether" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.12 (aban_tether)" jdkType="Python SDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="PackageRequirementsSettings">
+    <option name="removeUnused" value="true" />
+    <option name="modifyBaseFiles" value="true" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="PLAIN" />

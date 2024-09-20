@@ -37,7 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'orders'
+    'orders',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'celery',
+    'django_celery_beat'
+    # 'kombu.transport.django'
 ]
 
 MIDDLEWARE = [
@@ -77,15 +82,14 @@ WSGI_APPLICATION = 'exchange.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'aban',
+        'NAME': 'crypto_db',
         'USER': 'postgres',
         'PASSWORD': '1234',
         'HOST': 'localhost',
+        # 'HOST': 'db',
         'PORT': '5432',
     }
 }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -122,6 +126,49 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+
+
+# REST Framework configuration
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # Add other authentication classes if needed
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+# Celery Configuration Options
+# CELERY_BROKER_URL = 'redis://redis:6379/0'  # Use 'redis' if using Docker Compose
+# CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+# CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq:5672//'
+CELERY_RESULT_BACKEND = 'rpc://'  # For RabbitMQ, 'rpc://' is commonly used
+
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'process_large_orders': {
+        'task': 'orders.tasks.process_large_orders',
+        'schedule': 1.0,  # Every 1 second
+    },
+    'process_small_orders': {
+        'task': 'orders.tasks.process_small_orders',
+        'schedule': 5.0,  # Every 5 seconds
+    },
+    'requeue_failed_orders': {
+        'task': 'orders.tasks.requeue_stuck_orders',
+        'schedule': 60.0,  # Every 60 seconds
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

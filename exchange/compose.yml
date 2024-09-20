@@ -1,0 +1,64 @@
+
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=rpc://
+
+  celery:
+    build: .
+    command: celery -A exchange worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=rpc://
+
+  celery-beat:
+    build: .
+    command: celery -A exchange beat --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=rpc://
+
+  db:
+    image: docker.arvancloud.ir/postgres:14-alpine
+    environment:
+      - POSTGRES_DB=crypto_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: docker.arvancloud.ir/rabbitmq:3-management
+    ports:
+      - "5672:5672"    # Broker port
+      - "15672:15672"  # Management UI port
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
